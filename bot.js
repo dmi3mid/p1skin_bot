@@ -1,26 +1,37 @@
 const Tg = require('node-telegram-bot-api');
 require('dotenv').config();
-
-const voices = require('./voices');
-
 const bot = new Tg(process.env.TOKEN, {polling: true});
 
-bot.on("inline_query", async (query) => {
-    const queryText = query.query.trim().toLowerCase();
-    
-    let results = [
-        {
-            type: "voice",
-            id: queryText,
-            title: `Voice ${queryText}`,
-            voice_file_id: voices[queryText],
+async function getResults(url = 'http://localhost:2800/results') {
+    try {
+        let response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            }
+        })
+        if (!response.ok) {
+            throw new Error(`Помилка запиту: ${response.statusText}`);
         }
-    ];
-
-    if (!voices[queryText]) {
-        console.log(`⚠️ Не знайдено голос для запиту: "${queryText}"`);
-        return;
+        let result = await response.json();
+        return result   
+    } catch (error) {
+        console.error('Помилка запиту', error)
     }
+}
 
+bot.onText("/start", async (msg) => {
+    const chatId = msg.chat.id;
+    await bot.sendMessage(chatId, "Привіт! Я бот для відправки голосових повідомлень");
+});
+
+bot.on("voice", async (msg) => {
+    const chatId = msg.chat.id;
+    const voiceId = msg?.voice?.file_id;
+    await bot.sendMessage(chatId, `Voice id:\n<code>${voiceId}</code>`, { parse_mode: "HTML" });
+});
+
+bot.on("inline_query", async (query) => {
+    const results = await getResults();
     await bot.answerInlineQuery(query.id, results);
 });
