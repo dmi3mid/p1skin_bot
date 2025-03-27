@@ -16,15 +16,10 @@ async function promiseReadFile(pathToFile) {
     }
 }
 
-server.get('/', (req, res) => {
-    res.send('Hello World!');
-});
-
 server.get('/results', async (req, res) => {
     const content = await promiseReadFile(pathToFile);
     res.send(content);
-    res.end();
-    // console.log(content);
+    res.end().status(200);
 });
 
 
