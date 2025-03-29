@@ -11,7 +11,7 @@ async function promiseReadFile(pathToFile) {
 }
 async function promiseWriteFile(pathToFile, data) {
     try {
-        await fsPromise.writeFile(pathToFile, data, "utf-8");
+        await fsPromises.writeFile(pathToFile, data, "utf-8");
         console.log("File was rewrited");
     } catch (error) {
         console.log(error);
