@@ -9,7 +9,16 @@ async function promiseReadFile(pathToFile) {
         return null;
     }
 }
+async function promiseWriteFile(pathToFile, data) {
+    try {
+        await fsPromises.writeFile(pathToFile, data, "utf-8");
+        console.log("File was rewrited");
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 module.exports = {
-    promiseReadFile
+    promiseReadFile,
+    promiseWriteFile
 }
